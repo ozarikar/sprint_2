@@ -1,0 +1,5 @@
+test/PrisonersDilemmaTest.class
+test/RoundRobinTournamentTest.class
+test/RobotTest.class
+test/ListenerTest.class
+test/IntegrationTest.class

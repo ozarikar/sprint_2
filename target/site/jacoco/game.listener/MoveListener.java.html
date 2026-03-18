@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MoveListener.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">REST</a> &gt; <a href="index.source.html" class="el_package">game.listener</a> &gt; <span class="el_source">MoveListener.java</span></div><h1>MoveListener.java</h1><pre class="source lang-java linenums">package game.listener;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+// Observer that logs each move from in the game.
+
+public class MoveListener implements GameListener {
+    private String player1Name;
+    private String player2Name;
+    private String action1;
+    private String action2;
+    private int roundNumber;
+    private PrintWriter writer;
+    
+<span class="fc" id="L17">    public MoveListener(String filename) {</span>
+        try {
+<span class="fc" id="L19">            writer = new PrintWriter(new FileWriter(filename, true));</span>
+<span class="fc" id="L20">            roundNumber = 0;</span>
+<span class="nc" id="L21">        } catch (IOException e) {</span>
+<span class="nc" id="L22">            System.err.println(&quot;Error creating MoveListener: &quot; + e.getMessage());</span>
+<span class="fc" id="L23">        }</span>
+<span class="fc" id="L24">    }</span>
+    
+    // Updates listener with move information.
+    public void setMoveData(String p1Name, String p2Name, String a1, String a2) {
+<span class="fc" id="L28">        this.player1Name = p1Name;</span>
+<span class="fc" id="L29">        this.player2Name = p2Name;</span>
+<span class="fc" id="L30">        this.action1 = a1;</span>
+<span class="fc" id="L31">        this.action2 = a2;</span>
+<span class="fc" id="L32">        this.roundNumber++;</span>
+<span class="fc" id="L33">    }</span>
+    
+    @Override
+    public void update() {
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">        if (writer != null) {</span>
+<span class="fc" id="L38">            writer.println(String.format(&quot;Round %d: %s chose %s, %s chose %s&quot;,</span>
+<span class="fc" id="L39">                roundNumber, player1Name, action1, player2Name, action2));</span>
+<span class="fc" id="L40">            writer.flush();</span>
+        }
+<span class="fc" id="L42">    }</span>
+    
+    public void close() {
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (writer != null) {</span>
+<span class="fc" id="L46">            writer.close();</span>
+        }
+<span class="fc" id="L48">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

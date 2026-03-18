@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PrisonersDilemma.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">REST</a> &gt; <a href="index.source.html" class="el_package">game</a> &gt; <span class="el_source">PrisonersDilemma.java</span></div><h1>PrisonersDilemma.java</h1><pre class="source lang-java linenums">package game;
+
+import robot.Robot;
+import java.util.Arrays;
+
+/**
+ * Implementation of the Prisoner's Dilemma game.
+ * Scoring matrix:
+ * Both COOPERATE: (3, 3)
+ * Both DEFECT: (1, 1)
+ * One COOPERATE, one DEFECT: (0, 5) - defector gets 5, cooperator gets 0
+ */
+public class PrisonersDilemma extends Game {
+    private int maxRounds;
+    private Robot player1;
+    private Robot player2;
+    
+    public PrisonersDilemma(int maxRounds) {
+<span class="fc" id="L19">        super();</span>
+<span class="fc" id="L20">        this.maxRounds = maxRounds;</span>
+<span class="fc" id="L21">        this.actions = Arrays.asList(&quot;COOPERATE&quot;, &quot;DEFECT&quot;);</span>
+<span class="fc" id="L22">    }</span>
+    
+    @Override
+    public int[] run(Robot robot1, Robot robot2) {
+<span class="fc" id="L26">        this.player1 = robot1;</span>
+<span class="fc" id="L27">        this.player2 = robot2;</span>
+<span class="fc" id="L28">        return super.run(robot1, robot2);</span>
+    }
+    
+    @Override
+    protected boolean checkEnd() {
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        return currentRound &gt;= maxRounds;</span>
+    }
+    
+    @Override
+    protected int[] giveOutcome(String action1, String action2) {
+<span class="fc" id="L38">        int score1 = 0;</span>
+<span class="fc" id="L39">        int score2 = 0;</span>
+        
+<span class="fc bfc" id="L41" title="All 4 branches covered.">        if (action1.equals(&quot;COOPERATE&quot;) &amp;&amp; action2.equals(&quot;COOPERATE&quot;)) {</span>
+<span class="fc" id="L42">            score1 = 3;</span>
+<span class="fc" id="L43">            score2 = 3;</span>
+<span class="fc bfc" id="L44" title="All 4 branches covered.">        } else if (action1.equals(&quot;DEFECT&quot;) &amp;&amp; action2.equals(&quot;DEFECT&quot;)) {</span>
+<span class="fc" id="L45">            score1 = 1;</span>
+<span class="fc" id="L46">            score2 = 1;</span>
+<span class="pc bpc" id="L47" title="1 of 4 branches missed.">        } else if (action1.equals(&quot;COOPERATE&quot;) &amp;&amp; action2.equals(&quot;DEFECT&quot;)) {</span>
+<span class="fc" id="L48">            score1 = 0;</span>
+<span class="fc" id="L49">            score2 = 5;</span>
+<span class="pc bpc" id="L50" title="2 of 4 branches missed.">        } else if (action1.equals(&quot;DEFECT&quot;) &amp;&amp; action2.equals(&quot;COOPERATE&quot;)) {</span>
+<span class="fc" id="L51">            score1 = 5;</span>
+<span class="fc" id="L52">            score2 = 0;</span>
+        }
+        
+<span class="fc" id="L55">        return new int[] { score1, score2 };</span>
+    }
+    
+    @Override
+    public String getOpponentName(Robot robot) {
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        if (robot == player1) {</span>
+<span class="fc" id="L61">            return player2.getName();</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        } else if (robot == player2) {</span>
+<span class="fc" id="L63">            return player1.getName();</span>
+        }
+<span class="fc" id="L65">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
