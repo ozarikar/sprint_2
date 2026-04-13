@@ -3,99 +3,69 @@
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import robot.HumanBot;
 import robot.RemoteBot;
-import robot.Robot;
+import robot.TitForTatBot;
 import tournament.RoundRobinTournament;
 import tournament.Tournament;
 import game.PrisonersDilemma;
 
 import java.util.*;
 
-/**
- * Spring Boot REST server that manages tournaments and handles remote player registration.
- *
- * Endpoints:
- *   GET  /tournaments          — list all tournaments with name and open/closed status
- *   POST /register             — register a robot into a tournament
- *
- * When a tournament fills up (isOpen() becomes false), it is automatically
- * started in a background thread so the HTTP response returns immediately.
- */
 @SpringBootApplication
 @RestController
-<span class="fc" id="L30">public class NetworkedTournamentServer {</span>
+<span class="fc" id="L18">public class NetworkedTournamentServer {</span>
 
-<span class="fc" id="L32">    private final List&lt;Tournament&gt; tournaments = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L20">    private final List&lt;Tournament&gt; tournaments = new ArrayList&lt;&gt;();</span>
 
     public static void main(String[] args) {
-<span class="nc" id="L35">        SpringApplication.run(NetworkedTournamentServer.class, args);</span>
-<span class="nc" id="L36">    }</span>
+<span class="nc" id="L23">        SpringApplication.run(NetworkedTournamentServer.class, args);</span>
+<span class="nc" id="L24">    }</span>
 
     @PostConstruct
     public void init() {
-<span class="fc" id="L40">        tournaments.add(new RoundRobinTournament(new PrisonersDilemma(5),  &quot;Alpha League&quot;, 4));</span>
-<span class="fc" id="L41">        tournaments.add(new RoundRobinTournament(new PrisonersDilemma(10), &quot;Beta Cup&quot;,     6));</span>
-<span class="fc" id="L42">        tournaments.add(new RoundRobinTournament(new PrisonersDilemma(3),  &quot;Gamma Open&quot;,   8));</span>
-<span class="fc" id="L43">    }</span>
+        // Each tournament holds 3 players: 1 human + 2 auto-fill bots
+<span class="fc" id="L29">        tournaments.add(new RoundRobinTournament(new PrisonersDilemma(5),  &quot;Alpha League&quot;, 3));</span>
+<span class="fc" id="L30">        tournaments.add(new RoundRobinTournament(new PrisonersDilemma(10), &quot;Beta Cup&quot;,     3));</span>
+<span class="fc" id="L31">        tournaments.add(new RoundRobinTournament(new PrisonersDilemma(3),  &quot;Gamma Open&quot;,   3));</span>
+<span class="fc" id="L32">    }</span>
 
-    /**
-     * GET /tournaments
-     * Returns a JSON array of {name, open} objects.
-     */
     @GetMapping(&quot;/tournaments&quot;)
     public List&lt;Map&lt;String, Object&gt;&gt; getTournaments() {
-<span class="fc" id="L51">        List&lt;Map&lt;String, Object&gt;&gt; result = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L52" title="All 2 branches covered.">        for (Tournament t : tournaments) {</span>
-<span class="fc" id="L53">            Map&lt;String, Object&gt; entry = new LinkedHashMap&lt;&gt;();</span>
-<span class="fc" id="L54">            entry.put(&quot;name&quot;, t.getName());</span>
-<span class="fc" id="L55">            entry.put(&quot;open&quot;, t.isOpen());</span>
-<span class="fc" id="L56">            result.add(entry);</span>
-<span class="fc" id="L57">        }</span>
-<span class="fc" id="L58">        return result;</span>
+<span class="fc" id="L36">        List&lt;Map&lt;String, Object&gt;&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        for (Tournament t : tournaments) {</span>
+<span class="fc" id="L38">            Map&lt;String, Object&gt; entry = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L39">            entry.put(&quot;name&quot;, t.getName());</span>
+<span class="fc" id="L40">            entry.put(&quot;open&quot;, t.isOpen());</span>
+<span class="fc" id="L41">            result.add(entry);</span>
+<span class="fc" id="L42">        }</span>
+<span class="fc" id="L43">        return result;</span>
     }
 
-    /**
-     * POST /register
-     * Request body (JSON): { &quot;robotName&quot;: &quot;...&quot;, &quot;tournamentName&quot;: &quot;...&quot;, &quot;ip&quot;: &quot;...&quot; }
-     *
-     * - If ip is blank/missing → creates a HumanBot (human input via the client's stdin)
-     * - If ip is provided      → creates a RemoteBot (server calls back to client's /action)
-     *
-     * Returns true on success, false if tournament not found or is full.
-     * Auto-starts the tournament in a background thread when the last spot is filled.
-     */
     @PostMapping(&quot;/register&quot;)
-    public synchronized ResponseEntity&lt;Boolean&gt; register(@RequestBody Map&lt;String, String&gt; body) {
-<span class="fc" id="L73">        String robotName      = body.get(&quot;robotName&quot;);</span>
-<span class="fc" id="L74">        String tournamentName = body.get(&quot;tournamentName&quot;);</span>
-<span class="fc" id="L75">        String ip             = body.getOrDefault(&quot;ip&quot;, &quot;&quot;);</span>
+    public synchronized boolean register(@RequestBody Map&lt;String, String&gt; body) {
+<span class="fc" id="L48">        String robotName      = body.get(&quot;robotName&quot;);</span>
+<span class="fc" id="L49">        String tournamentName = body.get(&quot;tournamentName&quot;);</span>
+<span class="fc" id="L50">        String ip             = body.getOrDefault(&quot;ip&quot;, &quot;&quot;);</span>
 
-<span class="fc" id="L77">        Tournament target = tournaments.stream()</span>
-<span class="fc" id="L78">            .filter(t -&gt; t.getName().equals(tournamentName))</span>
-<span class="fc" id="L79">            .findFirst()</span>
-<span class="fc" id="L80">            .orElse(null);</span>
+<span class="fc" id="L52">        Tournament target = tournaments.stream()</span>
+<span class="fc" id="L53">            .filter(t -&gt; t.getName().equals(tournamentName))</span>
+<span class="fc" id="L54">            .findFirst().orElse(null);</span>
 
-<span class="pc bpc" id="L82" title="1 of 4 branches missed.">        if (target == null || !target.isOpen()) {</span>
-<span class="fc" id="L83">            return ResponseEntity.ok(false);</span>
+<span class="pc bpc" id="L56" title="1 of 4 branches missed.">        if (target == null || !target.isOpen()) return false;</span>
+
+        // Add the human as a RemoteBot — server calls back to client's /action each round
+<span class="fc" id="L59">        target.addPlayer(new RemoteBot(robotName, ip));</span>
+
+        // Fill remaining spots with CopyBots, then start immediately
+<span class="fc" id="L62">        int i = 0;</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        while (target.isOpen()) {</span>
+<span class="fc" id="L64">            target.addPlayer(new TitForTatBot(&quot;AutoBot&quot; + i++));</span>
         }
+<span class="fc" id="L66">        new Thread(target::runTournament).start();</span>
 
-<span class="pc bpc" id="L86" title="1 of 4 branches missed.">        Robot bot = (ip == null || ip.isBlank())</span>
-<span class="fc" id="L87">            ? new HumanBot(robotName)</span>
-<span class="fc" id="L88">            : new RemoteBot(robotName, ip);</span>
-
-<span class="fc" id="L90">        target.addPlayer(bot);</span>
-
-        // Auto-start when the tournament is now full
-<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (!target.isOpen()) {</span>
-<span class="nc" id="L94">            Tournament toRun = target;</span>
-<span class="nc" id="L95">            new Thread(() -&gt; toRun.runTournament()).start();</span>
-        }
-
-<span class="fc" id="L98">        return ResponseEntity.ok(true);</span>
+<span class="fc" id="L68">        return true;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

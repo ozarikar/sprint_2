@@ -1,5 +1,9 @@
+test/ServerIntegrationTest.class
 test/PrisonersDilemmaTest.class
+test/GameCopyBotTest.class
 test/RoundRobinTournamentTest.class
 test/RobotTest.class
+test/TournamentModificationsTest.class
+test/NewRobotTest.class
 test/ListenerTest.class
 test/IntegrationTest.class

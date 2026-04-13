@@ -20,8 +20,8 @@ public class TitForTatBot extends Robot implements OpponentAware {
     
     @Override
     public String getAction() {
-<span class="pc bpc" id="L23" title="1 of 2 branches missed.">        if (currentOpponent == null) {</span>
-<span class="nc" id="L24">            return &quot;COOPERATE&quot;; // default to cooperate if no opponent set</span>
+<span class="fc bfc" id="L23" title="All 2 branches covered.">        if (currentOpponent == null) {</span>
+<span class="fc" id="L24">            return &quot;COOPERATE&quot;; // default to cooperate if no opponent set</span>
         }
         
 <span class="fc" id="L27">        String lastAction = getLastOpponentAction(currentOpponent);</span>

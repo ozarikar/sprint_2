@@ -6,9 +6,6 @@
 /Users/omkar/Desktop/CSC 360/sprint_2/src/main/java/game/listener/ScoreListener.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/main/java/robot/AlwaysCooperateBot.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/main/java/robot/AlwaysDefectBot.java
-/Users/omkar/Desktop/CSC 360/sprint_2/src/main/java/robot/CollabBot.java
-/Users/omkar/Desktop/CSC 360/sprint_2/src/main/java/robot/CopyBot.java
-/Users/omkar/Desktop/CSC 360/sprint_2/src/main/java/robot/DefectBot.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/main/java/robot/HumanBot.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/main/java/robot/OpponentAware.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/main/java/robot/RemoteBot.java

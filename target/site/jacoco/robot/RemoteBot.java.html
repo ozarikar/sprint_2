@@ -28,29 +28,29 @@ public class RemoteBot extends Robot {
     @Override
     public String getAction() {
         try {
-<span class="nc" id="L31">            String action = restClient.get()</span>
-<span class="nc" id="L32">                .uri(&quot;http://&quot; + ip + &quot;/action&quot;)</span>
-<span class="nc" id="L33">                .retrieve()</span>
+<span class="fc" id="L31">            String action = restClient.get()</span>
+<span class="fc" id="L32">                .uri(&quot;http://&quot; + ip + &quot;/action&quot;)</span>
+<span class="fc" id="L33">                .retrieve()</span>
 <span class="nc" id="L34">                .body(String.class);</span>
 <span class="nc bnc" id="L35" title="All 2 branches missed.">            return (action != null) ? action.trim().toUpperCase() : &quot;COOPERATE&quot;;</span>
-<span class="nc" id="L36">        } catch (RestClientException e) {</span>
-<span class="nc" id="L37">            System.err.println(&quot;[RemoteBot] Could not reach &quot; + ip + &quot;: &quot; + e.getMessage()</span>
+<span class="fc" id="L36">        } catch (RestClientException e) {</span>
+<span class="fc" id="L37">            System.err.println(&quot;[RemoteBot] Could not reach &quot; + ip + &quot;: &quot; + e.getMessage()</span>
                 + &quot; — defaulting to COOPERATE&quot;);
-<span class="nc" id="L39">            return &quot;COOPERATE&quot;;</span>
+<span class="fc" id="L39">            return &quot;COOPERATE&quot;;</span>
         }
     }
 
     @Override
     public int getScore() {
-<span class="nc" id="L45">        return score;</span>
+<span class="fc" id="L45">        return score;</span>
     }
 
     @Override
     public void giveOutcome(String opponentName, String myAction,
                             String opponentAction, int myScore) {
-<span class="nc" id="L51">        super.giveOutcome(opponentName, myAction, opponentAction, myScore);</span>
-<span class="nc" id="L52">        this.score += myScore;</span>
-<span class="nc" id="L53">    }</span>
+<span class="fc" id="L51">        super.giveOutcome(opponentName, myAction, opponentAction, myScore);</span>
+<span class="fc" id="L52">        this.score += myScore;</span>
+<span class="fc" id="L53">    }</span>
 
     public String getIp() {
 <span class="nc" id="L56">        return ip;</span>

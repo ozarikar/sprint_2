@@ -6,120 +6,81 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClient;
 
 import robot.HumanBot;
-import robot.Robot;
-import org.springframework.web.client.RestClient;
 
 import java.util.*;
 
-/**
- * Spring Boot client application that:
- *  1. Exposes GET /action  — called by RemoteBot on the server during tournament play.
- *     The response is the local bot's chosen action (blocks on stdin for HumanBot).
- *
- *  2. On startup (after Tomcat is ready), guides the user through:
- *     - Fetching available tournaments from the server
- *     - Picking a tournament and registering
- *
- * Run with --spring.profiles.active=client to use port 8081 (see application-client.properties).
- */
 @SpringBootApplication
 @RestController
-<span class="nc" id="L29">public class NetworkedTournamentClient implements ApplicationRunner {</span>
+<span class="nc" id="L17">public class NetworkedTournamentClient implements ApplicationRunner {</span>
 
-    // The local bot — set after the user decides their strategy (human or algorithmic)
-    private Robot bot;
+    private HumanBot bot;
 
-    // Intentionally not closed: closing a Scanner wrapping System.in would close stdin
-<span class="nc" id="L35">    private final Scanner console = new Scanner(System.in);</span>
+    // Not closed intentionally — closing Scanner on System.in would close stdin
+<span class="nc" id="L22">    private final Scanner console = new Scanner(System.in);</span>
 
     public static void main(String[] args) {
-<span class="nc" id="L38">        SpringApplication.run(NetworkedTournamentClient.class, args);</span>
-<span class="nc" id="L39">    }</span>
+<span class="nc" id="L25">        SpringApplication.run(NetworkedTournamentClient.class, args);</span>
+<span class="nc" id="L26">    }</span>
 
-    /**
-     * GET /action
-     * Called by the server's RemoteBot during each round of the tournament.
-     * If bot is a HumanBot, this blocks until the human types a response.
-     */
+    // Called by the server's RemoteBot each round — blocks on stdin for human input
     @GetMapping(&quot;/action&quot;)
     public String getAction() {
-<span class="nc bnc" id="L48" title="All 2 branches missed.">        if (bot == null) {</span>
-<span class="nc" id="L49">            return &quot;COOPERATE&quot;; // safe default before registration completes</span>
-        }
-<span class="nc" id="L51">        return bot.getAction();</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">        return bot != null ? bot.getAction() : &quot;COOPERATE&quot;;</span>
     }
 
-    /**
-     * Runs after the embedded Tomcat is fully started,
-     * so /action is reachable before the user finishes the registration dialog.
-     */
+    // Runs after Tomcat is up, so /action is live before registration completes
     @Override
     public void run(ApplicationArguments args) throws Exception {
-<span class="nc" id="L60">        System.out.print(&quot;Enter server IP:port (e.g. 192.168.1.10:8080): &quot;);</span>
-<span class="nc" id="L61">        String serverIp = console.nextLine().trim();</span>
+<span class="nc" id="L37">        System.out.print(&quot;Server address (e.g. 127.0.0.1:8080): &quot;);</span>
+<span class="nc" id="L38">        String serverAddr = console.nextLine().trim();</span>
 
-<span class="nc" id="L63">        RestClient client = RestClient.create();</span>
+<span class="nc" id="L40">        RestClient client = RestClient.create();</span>
 
-        // Fetch available tournaments
-<span class="nc" id="L66">        List&lt;Map&lt;String, Object&gt;&gt; tournamentList = client.get()</span>
-<span class="nc" id="L67">            .uri(&quot;http://&quot; + serverIp + &quot;/tournaments&quot;)</span>
-<span class="nc" id="L68">            .retrieve()</span>
-<span class="nc" id="L69">            .body(new ParameterizedTypeReference&lt;&gt;() {});</span>
+<span class="nc" id="L42">        List&lt;Map&lt;String, Object&gt;&gt; tournamentList = client.get()</span>
+<span class="nc" id="L43">            .uri(&quot;http://&quot; + serverAddr + &quot;/tournaments&quot;)</span>
+<span class="nc" id="L44">            .retrieve()</span>
+<span class="nc" id="L45">            .body(new ParameterizedTypeReference&lt;&gt;() {});</span>
 
-<span class="nc" id="L71">        System.out.println(&quot;\nAvailable Tournaments:&quot;);</span>
-<span class="nc bnc" id="L72" title="All 2 branches missed.">        for (int i = 0; i &lt; tournamentList.size(); i++) {</span>
-<span class="nc" id="L73">            Map&lt;String, Object&gt; t = tournamentList.get(i);</span>
-<span class="nc bnc" id="L74" title="All 2 branches missed.">            String status = Boolean.TRUE.equals(t.get(&quot;open&quot;)) ? &quot;OPEN&quot; : &quot;CLOSED&quot;;</span>
-<span class="nc" id="L75">            System.out.println(&quot;  &quot; + (i + 1) + &quot;. &quot; + t.get(&quot;name&quot;) + &quot; [&quot; + status + &quot;]&quot;);</span>
+<span class="nc" id="L47">        System.out.println(&quot;\nAvailable Tournaments:&quot;);</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        for (int i = 0; i &lt; tournamentList.size(); i++) {</span>
+<span class="nc" id="L49">            Map&lt;String, Object&gt; t = tournamentList.get(i);</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">            String status = Boolean.TRUE.equals(t.get(&quot;open&quot;)) ? &quot;OPEN&quot; : &quot;CLOSED&quot;;</span>
+<span class="nc" id="L51">            System.out.println(&quot;  &quot; + (i + 1) + &quot;. &quot; + t.get(&quot;name&quot;) + &quot; [&quot; + status + &quot;]&quot;);</span>
         }
 
-<span class="nc" id="L78">        System.out.print(&quot;Pick tournament number: &quot;);</span>
-<span class="nc" id="L79">        int pick = Integer.parseInt(console.nextLine().trim()) - 1;</span>
-<span class="nc" id="L80">        String tournamentName = (String) tournamentList.get(pick).get(&quot;name&quot;);</span>
+<span class="nc" id="L54">        System.out.print(&quot;Pick number: &quot;);</span>
+<span class="nc" id="L55">        int pick = Integer.parseInt(console.nextLine().trim()) - 1;</span>
+<span class="nc" id="L56">        String tournamentName = (String) tournamentList.get(pick).get(&quot;name&quot;);</span>
 
-<span class="nc" id="L82">        System.out.print(&quot;Enter your robot name: &quot;);</span>
-<span class="nc" id="L83">        String robotName = console.nextLine().trim();</span>
+<span class="nc" id="L58">        System.out.print(&quot;Your robot name: &quot;);</span>
+<span class="nc" id="L59">        String robotName = console.nextLine().trim();</span>
 
-<span class="nc" id="L85">        System.out.print(&quot;Are you a human player? (y/n): &quot;);</span>
-<span class="nc" id="L86">        boolean isHuman = console.nextLine().trim().equalsIgnoreCase(&quot;y&quot;);</span>
+<span class="nc" id="L61">        System.out.print(&quot;Your IP:port (e.g. 127.0.0.1:8081): &quot;);</span>
+<span class="nc" id="L62">        String myIp = console.nextLine().trim();</span>
 
-        // Create the local bot
-<span class="nc" id="L89">        bot = new HumanBot(robotName);</span>
+        // Create the local HumanBot before registering so /action is ready
+<span class="nc" id="L65">        bot = new HumanBot(robotName);</span>
 
-        // For human players, no callback IP needed (server creates HumanBot locally)
-        // For remote bots, provide this machine's IP:port so the server can call /action
-<span class="nc" id="L93">        String myIp = &quot;&quot;;</span>
-<span class="nc bnc" id="L94" title="All 2 branches missed.">        if (!isHuman) {</span>
-<span class="nc" id="L95">            System.out.print(&quot;Enter this machine's IP:port (e.g. 192.168.1.20:8081): &quot;);</span>
-<span class="nc" id="L96">            myIp = console.nextLine().trim();</span>
-        }
+<span class="nc" id="L67">        Map&lt;String, String&gt; regBody = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L68">        regBody.put(&quot;robotName&quot;, robotName);</span>
+<span class="nc" id="L69">        regBody.put(&quot;tournamentName&quot;, tournamentName);</span>
+<span class="nc" id="L70">        regBody.put(&quot;ip&quot;, myIp);</span>
 
-        // Register with the server
-<span class="nc" id="L100">        Map&lt;String, String&gt; regBody = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L101">        regBody.put(&quot;robotName&quot;, robotName);</span>
-<span class="nc" id="L102">        regBody.put(&quot;tournamentName&quot;, tournamentName);</span>
-<span class="nc" id="L103">        regBody.put(&quot;ip&quot;, myIp);</span>
+<span class="nc" id="L72">        Boolean success = client.post()</span>
+<span class="nc" id="L73">            .uri(&quot;http://&quot; + serverAddr + &quot;/register&quot;)</span>
+<span class="nc" id="L74">            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)</span>
+<span class="nc" id="L75">            .body(regBody)</span>
+<span class="nc" id="L76">            .retrieve()</span>
+<span class="nc" id="L77">            .body(Boolean.class);</span>
 
-<span class="nc" id="L105">        Boolean success = client.post()</span>
-<span class="nc" id="L106">            .uri(&quot;http://&quot; + serverIp + &quot;/register&quot;)</span>
-<span class="nc" id="L107">            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)</span>
-<span class="nc" id="L108">            .body(regBody)</span>
-<span class="nc" id="L109">            .retrieve()</span>
-<span class="nc" id="L110">            .body(Boolean.class);</span>
-
-<span class="nc bnc" id="L112" title="All 2 branches missed.">        if (Boolean.TRUE.equals(success)) {</span>
-<span class="nc" id="L113">            System.out.println(&quot;\nRegistered successfully in \&quot;&quot; + tournamentName + &quot;\&quot;!&quot;);</span>
-<span class="nc bnc" id="L114" title="All 2 branches missed.">            if (!isHuman) {</span>
-<span class="nc" id="L115">                System.out.println(&quot;Listening for move requests on /action ...&quot;);</span>
-<span class="nc" id="L116">                System.out.println(&quot;(The server will call this endpoint each round of the game)&quot;);</span>
-            } else {
-<span class="nc" id="L118">                System.out.println(&quot;You will be prompted here when the tournament starts.&quot;);</span>
-            }
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (Boolean.TRUE.equals(success)) {</span>
+<span class="nc" id="L80">            System.out.println(&quot;Registered in \&quot;&quot; + tournamentName + &quot;\&quot;! You will be prompted for moves now.&quot;);</span>
         } else {
-<span class="nc" id="L121">            System.out.println(&quot;Registration failed. Tournament may be full or not found.&quot;);</span>
+<span class="nc" id="L82">            System.out.println(&quot;Registration failed — tournament may be full or not found.&quot;);</span>
         }
-<span class="nc" id="L123">    }</span>
+<span class="nc" id="L84">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
