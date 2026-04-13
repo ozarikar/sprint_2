@@ -14,12 +14,12 @@ import java.util.*;
 
 @SpringBootApplication
 @RestController
-<span class="nc" id="L17">public class NetworkedTournamentClient implements ApplicationRunner {</span>
+<span class="fc" id="L17">public class NetworkedTournamentClient implements ApplicationRunner {</span>
 
     private HumanBot bot;
 
     // Not closed intentionally — closing Scanner on System.in would close stdin
-<span class="nc" id="L22">    private final Scanner console = new Scanner(System.in);</span>
+<span class="fc" id="L22">    private final Scanner console = new Scanner(System.in);</span>
 
     public static void main(String[] args) {
 <span class="nc" id="L25">        SpringApplication.run(NetworkedTournamentClient.class, args);</span>
@@ -28,7 +28,7 @@ import java.util.*;
     // Called by the server's RemoteBot each round — blocks on stdin for human input
     @GetMapping(&quot;/action&quot;)
     public String getAction() {
-<span class="nc bnc" id="L31" title="All 2 branches missed.">        return bot != null ? bot.getAction() : &quot;COOPERATE&quot;;</span>
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">        return bot != null ? bot.getAction() : &quot;COOPERATE&quot;;</span>
     }
 
     // Runs after Tomcat is up, so /action is live before registration completes

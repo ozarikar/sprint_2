@@ -1,17 +1,17 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 REST,robot,Robot,0,81,0,4,0,18,0,8,0,6
 REST,robot,TitForTatBot,0,43,0,4,0,15,0,7,0,5
-REST,robot,RemoteBot,14,50,2,0,3,15,2,4,1,4
+REST,robot,RemoteBot,11,53,2,0,2,16,1,5,0,5
 REST,robot,AlwaysCooperateBot,0,25,0,0,0,8,0,4,0,4
-REST,robot,HumanBot,54,0,2,0,14,0,6,0,5,0
+REST,robot,HumanBot,18,36,2,0,5,9,2,4,1,4
 REST,robot,AlwaysDefectBot,0,25,0,0,0,8,0,4,0,4
-REST,server,NetworkedTournamentServer,5,158,1,7,2,27,2,8,1,5
-REST,game,PrisonersDilemma,0,123,3,19,0,28,3,13,0,5
-REST,game,Game,6,178,0,10,2,39,1,13,1,8
+REST,server,NetworkedTournamentServer,5,158,0,8,2,27,1,9,1,5
+REST,game,PrisonersDilemma,0,123,2,20,0,28,2,14,0,5
+REST,game,Game,0,184,0,10,0,41,0,14,0,9
 REST,client,NetworkedTournamentClient.new ParameterizedTypeReference() {...},6,0,0,0,1,0,1,0,1,0
-REST,client,NetworkedTournamentClient,175,0,8,0,39,0,8,0,4,0
+REST,client,NetworkedTournamentClient,161,14,7,1,36,3,6,2,2,2
 REST,tournament,Tournament,0,170,0,4,0,39,0,11,0,9
 REST,tournament,History,0,21,0,0,0,1,0,1,0,1
 REST,tournament,RoundRobinTournament,0,71,0,8,0,13,0,9,0,5
-REST,game.listener,MoveListener,6,83,2,2,2,19,2,4,0,4
-REST,game.listener,ScoreListener,6,85,2,2,2,19,2,4,0,4
+REST,game.listener,MoveListener,0,89,0,4,0,21,0,6,0,4
+REST,game.listener,ScoreListener,0,91,0,4,0,21,0,6,0,4

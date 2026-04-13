@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
-Test set: test.RobotTest
+Test set: test.HumanBotTest
 -------------------------------------------------------------------------------
-Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in test.RobotTest
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in test.HumanBotTest

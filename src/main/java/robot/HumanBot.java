@@ -9,11 +9,17 @@ import java.util.Scanner;
  */
 public class HumanBot extends Robot {
     private int score;
-    private static final Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner;
 
     public HumanBot(String name) {
+        this(name, new Scanner(System.in));
+    }
+
+    // Public constructor for testing — allows injecting a custom Scanner
+    public HumanBot(String name, Scanner scanner) {
         super(name);
         this.score = 0;
+        this.scanner = scanner;
     }
 
     @Override

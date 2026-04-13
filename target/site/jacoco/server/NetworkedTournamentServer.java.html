@@ -53,7 +53,7 @@ import java.util.*;
 <span class="fc" id="L53">            .filter(t -&gt; t.getName().equals(tournamentName))</span>
 <span class="fc" id="L54">            .findFirst().orElse(null);</span>
 
-<span class="pc bpc" id="L56" title="1 of 4 branches missed.">        if (target == null || !target.isOpen()) return false;</span>
+<span class="fc bfc" id="L56" title="All 4 branches covered.">        if (target == null || !target.isOpen()) return false;</span>
 
         // Add the human as a RemoteBot — server calls back to client's /action each round
 <span class="fc" id="L59">        target.addPlayer(new RemoteBot(robotName, ip));</span>

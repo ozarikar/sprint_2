@@ -1,9 +1,16 @@
 /Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/GameCopyBotTest.java
+/Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/GameRemoveScoreListenerTest.java
+/Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/HumanBotTest.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/IntegrationTest.java
+/Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/ListenerNullWriterTest.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/ListenerTest.java
+/Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/NetworkedTournamentClientTest.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/NewRobotTest.java
+/Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/PrisonersDilemmaBranchTest.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/PrisonersDilemmaTest.java
+/Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/RemoteBotTest.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/RobotTest.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/RoundRobinTournamentTest.java
+/Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/ServerClosedTournamentTest.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/ServerIntegrationTest.java
 /Users/omkar/Desktop/CSC 360/sprint_2/src/test/java/test/TournamentModificationsTest.java

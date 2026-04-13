@@ -9,12 +9,12 @@ import java.util.Scanner;
  */
 public class HumanBot extends Robot {
     private int score;
-<span class="nc" id="L12">    private static final Scanner scanner = new Scanner(System.in);</span>
+<span class="fc" id="L12">    private static final Scanner scanner = new Scanner(System.in);</span>
 
     public HumanBot(String name) {
-<span class="nc" id="L15">        super(name);</span>
-<span class="nc" id="L16">        this.score = 0;</span>
-<span class="nc" id="L17">    }</span>
+<span class="fc" id="L15">        super(name);</span>
+<span class="fc" id="L16">        this.score = 0;</span>
+<span class="fc" id="L17">    }</span>
 
     @Override
     public String getAction() {
@@ -28,16 +28,16 @@ public class HumanBot extends Robot {
 
     @Override
     public int getScore() {
-<span class="nc" id="L31">        return score;</span>
+<span class="fc" id="L31">        return score;</span>
     }
 
     @Override
     public void giveOutcome(String opponentName, String myAction,
                             String opponentAction, int myScore) {
-<span class="nc" id="L37">        super.giveOutcome(opponentName, myAction, opponentAction, myScore);</span>
-<span class="nc" id="L38">        this.score += myScore;</span>
-<span class="nc" id="L39">        System.out.println(&quot;[HumanBot] vs &quot; + opponentName + &quot;: you played &quot; + myAction +</span>
+<span class="fc" id="L37">        super.giveOutcome(opponentName, myAction, opponentAction, myScore);</span>
+<span class="fc" id="L38">        this.score += myScore;</span>
+<span class="fc" id="L39">        System.out.println(&quot;[HumanBot] vs &quot; + opponentName + &quot;: you played &quot; + myAction +</span>
             &quot;, they played &quot; + opponentAction + &quot;, you scored &quot; + myScore);
-<span class="nc" id="L41">    }</span>
+<span class="fc" id="L41">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -18,8 +18,8 @@ public class MoveListener implements GameListener {
         try {
 <span class="fc" id="L19">            writer = new PrintWriter(new FileWriter(filename, true));</span>
 <span class="fc" id="L20">            roundNumber = 0;</span>
-<span class="nc" id="L21">        } catch (IOException e) {</span>
-<span class="nc" id="L22">            System.err.println(&quot;Error creating MoveListener: &quot; + e.getMessage());</span>
+<span class="fc" id="L21">        } catch (IOException e) {</span>
+<span class="fc" id="L22">            System.err.println(&quot;Error creating MoveListener: &quot; + e.getMessage());</span>
 <span class="fc" id="L23">        }</span>
 <span class="fc" id="L24">    }</span>
     
@@ -34,7 +34,7 @@ public class MoveListener implements GameListener {
     
     @Override
     public void update() {
-<span class="pc bpc" id="L37" title="1 of 2 branches missed.">        if (writer != null) {</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (writer != null) {</span>
 <span class="fc" id="L38">            writer.println(String.format(&quot;Round %d: %s chose %s, %s chose %s&quot;,</span>
 <span class="fc" id="L39">                roundNumber, player1Name, action1, player2Name, action2));</span>
 <span class="fc" id="L40">            writer.flush();</span>
@@ -42,7 +42,7 @@ public class MoveListener implements GameListener {
 <span class="fc" id="L42">    }</span>
     
     public void close() {
-<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (writer != null) {</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (writer != null) {</span>
 <span class="fc" id="L46">            writer.close();</span>
         }
 <span class="fc" id="L48">    }</span>

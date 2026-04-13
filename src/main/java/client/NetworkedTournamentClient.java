@@ -19,7 +19,16 @@ public class NetworkedTournamentClient implements ApplicationRunner {
     private HumanBot bot;
 
     // Not closed intentionally — closing Scanner on System.in would close stdin
-    private final Scanner console = new Scanner(System.in);
+    private Scanner console;
+
+    public NetworkedTournamentClient() {
+        this.console = new Scanner(System.in);
+    }
+
+    // Public constructor for testing — allows injecting a custom Scanner
+    public NetworkedTournamentClient(Scanner console) {
+        this.console = console;
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(NetworkedTournamentClient.class, args);
@@ -29,6 +38,11 @@ public class NetworkedTournamentClient implements ApplicationRunner {
     @GetMapping("/action")
     public String getAction() {
         return bot != null ? bot.getAction() : "COOPERATE";
+    }
+
+    // Public setter for testing — allows setting the bot without run()
+    public void setBot(HumanBot bot) {
+        this.bot = bot;
     }
 
     // Runs after Tomcat is up, so /action is live before registration completes
