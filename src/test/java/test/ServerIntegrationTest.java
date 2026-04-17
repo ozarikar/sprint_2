@@ -1,6 +1,8 @@
 package test;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,6 +16,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Integration tests for NetworkedTournamentServer.
  * Uses Java's built-in HttpClient (JDK 17) — no extra Spring test dependencies needed.
+ *
+ * Spring caches the application context across test classes with identical config,
+ * so the server bean (and its in-memory tournaments list) is reused. We call
+ * seedTournaments() in @BeforeEach to reset state so tests never poison each other.
  */
 @SpringBootTest(
     classes = server.NetworkedTournamentServer.class,
@@ -24,7 +30,15 @@ public class ServerIntegrationTest {
     @Value("${local.server.port}")
     private int port;
 
+    @Autowired
+    private server.NetworkedTournamentServer serverBean;
+
     private final HttpClient http = HttpClient.newHttpClient();
+
+    @BeforeEach
+    public void resetServerState() {
+        serverBean.seedTournaments();
+    }
 
     private String url(String path) {
         return "http://localhost:" + port + path;

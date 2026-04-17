@@ -3,6 +3,7 @@ package test;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,11 +24,17 @@ public class ClientServerIntegrationTest {
     @Value("${local.server.port}")
     private int port;
 
+    // Reset in-memory tournament state before each test — the Spring context (and
+    // hence the tournaments list) is shared across methods and even test classes.
+    @Autowired
+    private server.NetworkedTournamentServer serverBean;
+
     private final PrintStream originalOut = System.out;
     private ByteArrayOutputStream outContent;
 
     @BeforeEach
     public void setUp() {
+        serverBean.seedTournaments();
         outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
     }

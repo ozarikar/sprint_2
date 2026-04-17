@@ -26,6 +26,13 @@ public class NetworkedTournamentServer {
     @PostConstruct
     public void init() {
         // Each tournament holds 3 players: 1 human + 2 auto-fill bots
+        seedTournaments();
+    }
+
+    // Extracted so tests can reset the in-memory state between methods without a full
+    // Spring context rebuild. Clears current list and re-adds the default tournaments.
+    public synchronized void seedTournaments() {
+        tournaments.clear();
         tournaments.add(new RoundRobinTournament(new PrisonersDilemma(5),  "Alpha League", 3));
         tournaments.add(new RoundRobinTournament(new PrisonersDilemma(10), "Beta Cup",     3));
         tournaments.add(new RoundRobinTournament(new PrisonersDilemma(3),  "Gamma Open",   3));
@@ -63,7 +70,10 @@ public class NetworkedTournamentServer {
         while (target.isOpen()) {
             target.addPlayer(new TitForTatBot("AutoBot" + i++));
         }
-        new Thread(target::runTournament).start();
+        // Daemon thread so it won't block JVM shutdown (e.g. at end of test runs)
+        Thread runner = new Thread(target::runTournament, "tournament-" + target.getName());
+        runner.setDaemon(true);
+        runner.start();
 
         return true;
     }

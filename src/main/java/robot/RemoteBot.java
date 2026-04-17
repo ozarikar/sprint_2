@@ -1,7 +1,10 @@
 package robot;
 
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+
+import java.time.Duration;
 
 /**
  * A proxy robot that delegates getAction() to a remote client machine via HTTP.
@@ -22,7 +25,13 @@ public class RemoteBot extends Robot {
         super(name);
         this.ip = ip;
         this.score = 0;
-        this.restClient = RestClient.create();
+        // Short timeouts so an unreachable / hung client never blocks the tournament.
+        // Without this, RestClient.create() inherits JDK defaults (potentially infinite),
+        // which is why tests pointing at a dead port could hang indefinitely.
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout((int) Duration.ofSeconds(2).toMillis());
+        factory.setReadTimeout((int) Duration.ofSeconds(5).toMillis());
+        this.restClient = RestClient.builder().requestFactory(factory).build();
     }
 
     @Override

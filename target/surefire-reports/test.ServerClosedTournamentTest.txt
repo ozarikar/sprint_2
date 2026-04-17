@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: test.ServerClosedTournamentTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.111 s -- in test.ServerClosedTournamentTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.107 s -- in test.ServerClosedTournamentTest
