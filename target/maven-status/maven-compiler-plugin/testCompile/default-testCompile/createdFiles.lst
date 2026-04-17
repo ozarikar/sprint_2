@@ -13,6 +13,5 @@ test/IntegrationTest.class
 test/ServerClosedTournamentTest.class
 test/PrisonersDilemmaTest.class
 test/GameCopyBotTest.class
-test/HumanBotTest.class
 test/RobotTest.class
 test/ListenerTest.class

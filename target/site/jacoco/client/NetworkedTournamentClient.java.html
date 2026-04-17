@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NetworkedTournamentClient.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">REST</a> &gt; <a href="index.source.html" class="el_package">client</a> &gt; <span class="el_source">NetworkedTournamentClient.java</span></div><h1>NetworkedTournamentClient.java</h1><pre class="source lang-java linenums">package client;
+
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClient;
+
+import robot.HumanBot;
+
+import java.util.*;
+
+@SpringBootApplication
+@RestController
+public class NetworkedTournamentClient implements ApplicationRunner {
+
+    private HumanBot bot;
+
+    // Not closed intentionally — closing Scanner on System.in would close stdin
+    private Scanner console;
+
+<span class="fc" id="L24">    public NetworkedTournamentClient() {</span>
+<span class="fc" id="L25">        this.console = new Scanner(System.in);</span>
+<span class="fc" id="L26">    }</span>
+
+    // Public constructor for testing — allows injecting a custom Scanner
+<span class="fc" id="L29">    public NetworkedTournamentClient(Scanner console) {</span>
+<span class="fc" id="L30">        this.console = console;</span>
+<span class="fc" id="L31">    }</span>
+
+    public static void main(String[] args) {
+<span class="nc" id="L34">        SpringApplication.run(NetworkedTournamentClient.class, args);</span>
+<span class="nc" id="L35">    }</span>
+
+    // Called by the server's RemoteBot each round — blocks on stdin for human input
+    @GetMapping(&quot;/action&quot;)
+    public String getAction() {
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        return bot != null ? bot.getAction() : &quot;COOPERATE&quot;;</span>
+    }
+
+    // Public setter for testing — allows setting the bot without run()
+    public void setBot(HumanBot bot) {
+<span class="fc" id="L45">        this.bot = bot;</span>
+<span class="fc" id="L46">    }</span>
+
+    // Runs after Tomcat is up, so /action is live before registration completes
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+<span class="fc" id="L51">        System.out.print(&quot;Server address (e.g. 127.0.0.1:8080): &quot;);</span>
+<span class="fc" id="L52">        String serverAddr = console.nextLine().trim();</span>
+
+<span class="fc" id="L54">        RestClient client = RestClient.create();</span>
+
+<span class="fc" id="L56">        List&lt;Map&lt;String, Object&gt;&gt; tournamentList = client.get()</span>
+<span class="fc" id="L57">            .uri(&quot;http://&quot; + serverAddr + &quot;/tournaments&quot;)</span>
+<span class="fc" id="L58">            .retrieve()</span>
+<span class="fc" id="L59">            .body(new ParameterizedTypeReference&lt;&gt;() {});</span>
+
+<span class="fc" id="L61">        System.out.println(&quot;\nAvailable Tournaments:&quot;);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        for (int i = 0; i &lt; tournamentList.size(); i++) {</span>
+<span class="fc" id="L63">            Map&lt;String, Object&gt; t = tournamentList.get(i);</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">            String status = Boolean.TRUE.equals(t.get(&quot;open&quot;)) ? &quot;OPEN&quot; : &quot;CLOSED&quot;;</span>
+<span class="fc" id="L65">            System.out.println(&quot;  &quot; + (i + 1) + &quot;. &quot; + t.get(&quot;name&quot;) + &quot; [&quot; + status + &quot;]&quot;);</span>
+        }
+
+<span class="fc" id="L68">        System.out.print(&quot;Pick number: &quot;);</span>
+<span class="fc" id="L69">        int pick = Integer.parseInt(console.nextLine().trim()) - 1;</span>
+<span class="fc" id="L70">        String tournamentName = (String) tournamentList.get(pick).get(&quot;name&quot;);</span>
+
+<span class="fc" id="L72">        System.out.print(&quot;Your robot name: &quot;);</span>
+<span class="fc" id="L73">        String robotName = console.nextLine().trim();</span>
+
+<span class="fc" id="L75">        System.out.print(&quot;Your IP:port (e.g. 127.0.0.1:8081): &quot;);</span>
+<span class="fc" id="L76">        String myIp = console.nextLine().trim();</span>
+
+        // Create the local HumanBot before registering so /action is ready
+<span class="fc" id="L79">        bot = new HumanBot(robotName);</span>
+
+<span class="fc" id="L81">        Map&lt;String, String&gt; regBody = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L82">        regBody.put(&quot;robotName&quot;, robotName);</span>
+<span class="fc" id="L83">        regBody.put(&quot;tournamentName&quot;, tournamentName);</span>
+<span class="fc" id="L84">        regBody.put(&quot;ip&quot;, myIp);</span>
+
+<span class="fc" id="L86">        Boolean success = client.post()</span>
+<span class="fc" id="L87">            .uri(&quot;http://&quot; + serverAddr + &quot;/register&quot;)</span>
+<span class="fc" id="L88">            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)</span>
+<span class="fc" id="L89">            .body(regBody)</span>
+<span class="fc" id="L90">            .retrieve()</span>
+<span class="fc" id="L91">            .body(Boolean.class);</span>
+
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (Boolean.TRUE.equals(success)) {</span>
+<span class="fc" id="L94">            System.out.println(&quot;Registered in \&quot;&quot; + tournamentName + &quot;\&quot;! You will be prompted for moves now.&quot;);</span>
+        } else {
+<span class="nc" id="L96">            System.out.println(&quot;Registration failed — tournament may be full or not found.&quot;);</span>
+        }
+<span class="fc" id="L98">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

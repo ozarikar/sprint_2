@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Game.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">REST</a> &gt; <a href="index.source.html" class="el_package">game</a> &gt; <span class="el_source">Game.java</span></div><h1>Game.java</h1><pre class="source lang-java linenums">package game;
+
+import robot.Robot;
+import game.listener.MoveListener;
+import game.listener.ScoreListener;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Abstract class for all games.
+ * Implemented Observer pattern as the Subject and Template Method pattern for game-specific rules.
+ */
+public abstract class Game {
+    protected List&lt;String&gt; actions;
+    protected List&lt;MoveListener&gt; moveListeners;
+    protected List&lt;ScoreListener&gt; scoreListeners;
+    protected int currentRound;
+    
+<span class="fc" id="L19">    public Game() {</span>
+<span class="fc" id="L20">        this.actions = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L21">        this.moveListeners = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L22">        this.scoreListeners = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L23">        this.currentRound = 0;</span>
+<span class="fc" id="L24">    }</span>
+    
+    // Template method: runs a complete game between two robots.
+    
+    public int[] run(Robot robot1, Robot robot2) {
+<span class="fc" id="L29">        currentRound = 0;</span>
+        
+        // Notify any opponent-aware robots of their current opponent
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (robot1 instanceof robot.OpponentAware) {</span>
+<span class="fc" id="L33">            ((robot.OpponentAware) robot1).setCurrentOpponent(robot2.getName());</span>
+        }
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (robot2 instanceof robot.OpponentAware) {</span>
+<span class="fc" id="L36">            ((robot.OpponentAware) robot2).setCurrentOpponent(robot1.getName());</span>
+        }
+        
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        while (!checkEnd()) {</span>
+<span class="fc" id="L40">            currentRound++;</span>
+            
+            // Get actions from both robots
+<span class="fc" id="L43">            String action1 = robot1.getAction();</span>
+<span class="fc" id="L44">            String action2 = robot2.getAction();</span>
+            
+            // Notify move listeners
+<span class="fc" id="L47">            notifyMoveListeners(robot1.getName(), robot2.getName(), action1, action2);</span>
+            
+            // Calculating outcomes based on game rules
+<span class="fc" id="L50">            int[] roundScores = giveOutcome(action1, action2);</span>
+            
+            // Updating robots with outcomes
+<span class="fc" id="L53">            robot1.giveOutcome(robot2.getName(), action1, action2, roundScores[0]);</span>
+<span class="fc" id="L54">            robot2.giveOutcome(robot1.getName(), action2, action1, roundScores[1]);</span>
+            
+            // Notify score listeners
+<span class="fc" id="L57">            notifyScoreListeners(robot1.getName(), robot2.getName(), </span>
+                                roundScores[0], roundScores[1]);
+<span class="fc" id="L59">        }</span>
+        
+        // Returns final scores
+<span class="fc" id="L62">        return new int[] { robot1.getScore(), robot2.getScore() };</span>
+    }
+    
+    // Abstract method to determine when the game ends.
+
+    protected abstract boolean checkEnd();
+    
+    
+    
+    /**
+     * Abstract method: calculates scores based on actions.
+     * @param action1 action of player 1 same with action2, @return array of scores [player1Score, player2Score]
+     */
+    protected abstract int[] giveOutcome(String action1, String action2);
+    
+    // Gets the opponent's name for a given robot.
+    public abstract String getOpponentName(Robot robot);
+    
+    // Observer pattern methods
+    public void addMoveListener(MoveListener listener) {
+<span class="fc" id="L82">        moveListeners.add(listener);</span>
+<span class="fc" id="L83">    }</span>
+    
+    public void removeMoveListener(MoveListener listener) {
+<span class="fc" id="L86">        moveListeners.remove(listener);</span>
+<span class="fc" id="L87">    }</span>
+    
+    public void addScoreListener(ScoreListener listener) {
+<span class="fc" id="L90">        scoreListeners.add(listener);</span>
+<span class="fc" id="L91">    }</span>
+    
+    public void removeScoreListener(ScoreListener listener) {
+<span class="fc" id="L94">        scoreListeners.remove(listener);</span>
+<span class="fc" id="L95">    }</span>
+    
+    protected void notifyMoveListeners(String p1, String p2, String a1, String a2) {
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        for (MoveListener listener : moveListeners) {</span>
+<span class="fc" id="L99">            listener.setMoveData(p1, p2, a1, a2);</span>
+<span class="fc" id="L100">            listener.update();</span>
+<span class="fc" id="L101">        }</span>
+<span class="fc" id="L102">    }</span>
+    
+    protected void notifyScoreListeners(String p1, String p2, int s1, int s2) {
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        for (ScoreListener listener : scoreListeners) {</span>
+<span class="fc" id="L106">            listener.setScoreData(p1, p2, s1, s2);</span>
+<span class="fc" id="L107">            listener.update();</span>
+<span class="fc" id="L108">        }</span>
+<span class="fc" id="L109">    }</span>
+    
+    public List&lt;String&gt; getActions() {
+<span class="fc" id="L112">        return new ArrayList&lt;&gt;(actions);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

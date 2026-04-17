@@ -1,4 +1,4 @@
-package test;
+ package test;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,9 +25,7 @@ public class RemoteBotTest {
 
     @Test
     public void testRemoteBotGetActionFallsBackOnConnectionError() {
-        // Port 1 is privileged and nothing is listening on it, so connect() is
-        // refused almost immediately on every major OS. RemoteBot now also uses
-        // a 2s connect timeout, so the worst case is still fast.
+         
         RemoteBot bot = new RemoteBot("TestRemote", "127.0.0.1:1");
         String action = bot.getAction();
         // Should default to COOPERATE when it can't reach the server

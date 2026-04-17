@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NetworkedTournamentServer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">REST</a> &gt; <a href="index.source.html" class="el_package">server</a> &gt; <span class="el_source">NetworkedTournamentServer.java</span></div><h1>NetworkedTournamentServer.java</h1><pre class="source lang-java linenums">package server;
+
+import jakarta.annotation.PostConstruct;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.*;
+
+import robot.RemoteBot;
+import robot.TitForTatBot;
+import tournament.RoundRobinTournament;
+import tournament.Tournament;
+import game.PrisonersDilemma;
+
+import java.util.*;
+
+@SpringBootApplication
+@RestController
+<span class="fc" id="L18">public class NetworkedTournamentServer {</span>
+
+<span class="fc" id="L20">    private final List&lt;Tournament&gt; tournaments = new ArrayList&lt;&gt;();</span>
+
+    public static void main(String[] args) {
+<span class="nc" id="L23">        SpringApplication.run(NetworkedTournamentServer.class, args);</span>
+<span class="nc" id="L24">    }</span>
+
+    @PostConstruct
+    public void init() {
+        // Each tournament holds 3 players: 1 human + 2 auto-fill bots
+<span class="fc" id="L29">        seedTournaments();</span>
+<span class="fc" id="L30">    }</span>
+
+    // Extracted so tests can reset the in-memory state between methods without a full
+    // Spring context rebuild. Clears current list and re-adds the default tournaments.
+    public synchronized void seedTournaments() {
+<span class="fc" id="L35">        tournaments.clear();</span>
+<span class="fc" id="L36">        tournaments.add(new RoundRobinTournament(new PrisonersDilemma(5),  &quot;Alpha League&quot;, 3));</span>
+<span class="fc" id="L37">        tournaments.add(new RoundRobinTournament(new PrisonersDilemma(10), &quot;Beta Cup&quot;,     3));</span>
+<span class="fc" id="L38">        tournaments.add(new RoundRobinTournament(new PrisonersDilemma(3),  &quot;Gamma Open&quot;,   3));</span>
+<span class="fc" id="L39">    }</span>
+
+    @GetMapping(&quot;/tournaments&quot;)
+    public List&lt;Map&lt;String, Object&gt;&gt; getTournaments() {
+<span class="fc" id="L43">        List&lt;Map&lt;String, Object&gt;&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        for (Tournament t : tournaments) {</span>
+<span class="fc" id="L45">            Map&lt;String, Object&gt; entry = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L46">            entry.put(&quot;name&quot;, t.getName());</span>
+<span class="fc" id="L47">            entry.put(&quot;open&quot;, t.isOpen());</span>
+<span class="fc" id="L48">            result.add(entry);</span>
+<span class="fc" id="L49">        }</span>
+<span class="fc" id="L50">        return result;</span>
+    }
+
+    @PostMapping(&quot;/register&quot;)
+    public synchronized boolean register(@RequestBody Map&lt;String, String&gt; body) {
+<span class="fc" id="L55">        String robotName      = body.get(&quot;robotName&quot;);</span>
+<span class="fc" id="L56">        String tournamentName = body.get(&quot;tournamentName&quot;);</span>
+<span class="fc" id="L57">        String ip             = body.getOrDefault(&quot;ip&quot;, &quot;&quot;);</span>
+
+<span class="fc" id="L59">        Tournament target = tournaments.stream()</span>
+<span class="fc" id="L60">            .filter(t -&gt; t.getName().equals(tournamentName))</span>
+<span class="fc" id="L61">            .findFirst().orElse(null);</span>
+
+<span class="fc bfc" id="L63" title="All 4 branches covered.">        if (target == null || !target.isOpen()) return false;</span>
+
+        // Add the human as a RemoteBot — server calls back to client's /action each round
+<span class="fc" id="L66">        target.addPlayer(new RemoteBot(robotName, ip));</span>
+
+        // Fill remaining spots with CopyBots, then start immediately
+<span class="fc" id="L69">        int i = 0;</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        while (target.isOpen()) {</span>
+<span class="fc" id="L71">            target.addPlayer(new TitForTatBot(&quot;AutoBot&quot; + i++));</span>
+        }
+        // Daemon thread so it won't block JVM shutdown (e.g. at end of test runs)
+<span class="fc" id="L74">        Thread runner = new Thread(target::runTournament, &quot;tournament-&quot; + target.getName());</span>
+<span class="fc" id="L75">        runner.setDaemon(true);</span>
+<span class="fc" id="L76">        runner.start();</span>
+
+<span class="fc" id="L78">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

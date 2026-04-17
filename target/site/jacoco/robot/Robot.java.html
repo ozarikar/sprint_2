@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Robot.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">REST</a> &gt; <a href="index.source.html" class="el_package">robot</a> &gt; <span class="el_source">Robot.java</span></div><h1>Robot.java</h1><pre class="source lang-java linenums">package robot;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+// Abstract base class for all robotic participants.
+
+public abstract class Robot {
+    private String name;
+    // History maps opponent names to their interaction history
+    private Map&lt;String, List&lt;String&gt;&gt; history;
+    
+<span class="fc" id="L15">    public Robot(String name) {</span>
+<span class="fc" id="L16">        this.name = name;</span>
+<span class="fc" id="L17">        this.history = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L18">    }</span>
+    
+    /**
+     * Subclasses implement this to define their strategy.
+     * @return the action as a String (example: &quot;COOPERATE&quot; or &quot;DEFECT&quot;)
+     */
+    public abstract String getAction();
+    
+    // Gets the current score (for tracking purposes), @return current score
+    public abstract int getScore();
+    
+    /**
+     * Updates the robot with the outcome of a round.
+     * @param opponentName name of the opponent, @param myAction action this robot took
+     * @param opponentAction action the opponent took, @param myScore score this robot received
+     */
+    public void giveOutcome(String opponentName, String myAction, 
+                           String opponentAction, int myScore) {
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (!history.containsKey(opponentName)) {</span>
+<span class="fc" id="L37">            history.put(opponentName, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L39">        String interaction = myAction + &quot;,&quot; + opponentAction + &quot;,&quot; + myScore;</span>
+<span class="fc" id="L40">        history.get(opponentName).add(interaction);</span>
+<span class="fc" id="L41">    }</span>
+    
+    /**
+     * Gets the interaction history with a specific opponent.
+     * @param opponentName name of the opponent, @return list of past interactions
+     */
+    protected List&lt;String&gt; getHistoryWith(String opponentName) {
+<span class="fc" id="L48">        return history.getOrDefault(opponentName, new ArrayList&lt;&gt;());</span>
+    }
+    
+    /**
+     * Gets the last action taken by an opponent.
+     * @param opponentName name of the opponent, @return the last action, or null if no history
+     */
+    protected String getLastOpponentAction(String opponentName) {
+<span class="fc" id="L56">        List&lt;String&gt; opponentHistory = getHistoryWith(opponentName);</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (opponentHistory.isEmpty()) {</span>
+<span class="fc" id="L58">            return null;</span>
+        }
+<span class="fc" id="L60">        String lastInteraction = opponentHistory.get(opponentHistory.size() - 1);</span>
+<span class="fc" id="L61">        String[] parts = lastInteraction.split(&quot;,&quot;);</span>
+<span class="fc" id="L62">        return parts[1]; // opponent action is the second element</span>
+    }
+    
+    public String getName() {
+<span class="fc" id="L66">        return name;</span>
+    }
+    
+    public Map&lt;String, List&lt;String&gt;&gt; getHistory() {
+<span class="fc" id="L70">        return new HashMap&lt;&gt;(history);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
