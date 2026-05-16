@@ -65,8 +65,22 @@ public abstract class Robot {
     public String getName() {
         return name;
     }
-    
+
     public Map<String, List<String>> getHistory() {
         return new HashMap<>(history);
+    }
+
+    
+    public void setHistory(Map<String, List<String>> newHistory) {
+        if (newHistory == null) {
+            this.history = new HashMap<>();
+            return;
+        }
+        Map<String, List<String>> copy = new HashMap<>();
+        for (Map.Entry<String, List<String>> e : newHistory.entrySet()) {
+            List<String> value = e.getValue();
+            copy.put(e.getKey(), value == null ? new ArrayList<>() : new ArrayList<>(value));
+        }
+        this.history = copy;
     }
 }

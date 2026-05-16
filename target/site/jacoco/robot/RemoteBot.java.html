@@ -10,7 +10,7 @@ import java.time.Duration;
  * A proxy robot that delegates getAction() to a remote client machine via HTTP.
  *
  * When the tournament calls getAction(), RemoteBot makes a GET request to
- * http://{ip}/action on the client's machine. The client's NetworkedTournamentClient
+ * on the client's machine. The client's NetworkedTournamentClient
  * serves this endpoint, calling its local bot (e.g. HumanBot) and returning the result.
  *
  * Game and Tournament never deal with networking — RemoteBot looks identical to

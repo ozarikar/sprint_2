@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 
 import robot.HumanBot;
+import robot.Robot;
 
 import java.util.*;
 
@@ -16,7 +17,8 @@ import java.util.*;
 @RestController
 public class NetworkedTournamentClient implements ApplicationRunner {
 
-    private HumanBot bot;
+   
+    private Robot bot;
 
     // Not closed intentionally — closing Scanner on System.in would close stdin
     private Scanner console;
@@ -34,14 +36,27 @@ public class NetworkedTournamentClient implements ApplicationRunner {
         SpringApplication.run(NetworkedTournamentClient.class, args);
     }
 
-    // Called by the server's RemoteBot each round — blocks on stdin for human input
-    @GetMapping("/action")
+
+    @PostMapping("/action")
+    public String getActionEndpoint(
+            @RequestBody(required = false) Map<String, List<String>> history) {
+        if (bot == null) return "COOPERATE";
+        bot.setHistory(history != null ? history : new HashMap<>());
+        return bot.getAction();
+    }
+
+    /**
+     * Plain Java accessor used by unit tests that don't want to spin up the
+     * full HTTP stack. NOT a Spring endpoint — the wire-facing entry point
+     * is {@link #getActionEndpoint(Map)} above.
+     */
     public String getAction() {
         return bot != null ? bot.getAction() : "COOPERATE";
     }
 
-    // Public setter for testing — allows setting the bot without run()
-    public void setBot(HumanBot bot) {
+    // Public setter for testing — allows setting the bot without run().
+    // Accepts any Robot so non-human bots can be hosted by this client.
+    public void setBot(Robot bot) {
         this.bot = bot;
     }
 
